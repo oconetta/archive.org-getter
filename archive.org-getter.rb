@@ -5,6 +5,8 @@ require 'open-uri'
 start = 0
 ROWS = 200
 
+json_data = []
+
 # incrementally download JSON files
 while start < 1000
 # don't forget to turn variable numbers into strings with .to_s
@@ -29,6 +31,7 @@ while start < 1000
     start = start + ROWS
     aFile = File.new("TVNews_results"+ start.to_s + ".json", "w")
     aFile.write(results)
+    json_data += JSON.parse(results)
     aFile.close
   else 
     print "request failed"
