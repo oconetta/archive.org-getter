@@ -8,7 +8,7 @@ ROWS = 200
 # incrementally download JSON files
 while start < 1000
 # don't forget to turn variable numbers into strings with .to_s
-  url = "http://archive.org/details/tv?q=%22Your%20Query%22&start=" + start.to_s + "&rows=" + ROWS.to_s + "&output=json"
+  url = "http://archive.org/details/tv?q=%22Proposition%2034%22&time=20120917-20121112&start=" + start.to_s + "&rows=" + ROWS.to_s + "&output=json"
   print "fetching from " + start.to_s + "\n"
   print "  "+url + "\n"
 
