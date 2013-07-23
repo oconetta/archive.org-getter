@@ -58,7 +58,6 @@ tv_data.each { |hash| hash["snip"] }.each do |key, value|
   	end
   end 
 end
-
 snippets = snippets.flatten
 
 snippets.each do |snip|
@@ -73,12 +72,15 @@ snippets.each do |snip|
 	end
 end
 
+#create hash with dates as keys and snippets as values
 dates_and_snips = Hash.new(0)
 
+#add content from the two arrays to the hash
 count = 0
 while count < dates.length
   dates_and_snips[dates[count]] = snippets[count]
   count += 1
 end
 
+#print the hash
 pp dates_and_snips

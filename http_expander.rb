@@ -3,6 +3,7 @@ require 'open-uri'
 require 'json'
 require 'rest_client'
 require 'csv'
+require 'longurl'
 
 #ask for filename, prop
 puts "Are you in the directory in which the CSV file you want to use is located? Answer y/n"
