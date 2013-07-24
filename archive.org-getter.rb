@@ -36,9 +36,8 @@ def write_to_file
   # if page doesn't load...
     if results.index("Our Search Engine was not responsive.") == nil
       start = start + rows
-      path = "./" + search_term
       FileUtils.mkdir_p(path) unless File.exists?(path)
-      aFile = File.new(path + "/TVNews_results"+ start.to_s + ".json", "w")
+      aFile = File.new("TVNews_results"+ start.to_s + ".json", "w")
       aFile.write(results)
       aFile.close
     else 
