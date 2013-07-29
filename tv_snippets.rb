@@ -64,12 +64,6 @@ snippets.each do |snip|
   #get rid of bold tags from the snippets
   if snip.include?('<em>') then snip = snip.gsub!('<em>', "") end
   if snip.include?('</em>') then snip = snip.gsub!('</em>', "") end
-	#make it easy to tell where snippets begin and end
-  if snip == snippets[0]
-		puts "FIRST SNIPPET: " + snip
-	else
-		puts "NEXT SNIPPET: " + snip
-	end
 end
 
 #if the # of items in dates != the # of items in snippets...
@@ -78,26 +72,46 @@ if dates.length != snippets.length
   abort("We don't have the same amount of dates and snippets!")
 end
 
-#create hash with dates as keys and snippets as values
-dates_and_snips = Hash.new(0)
+#class to hold dates and text from snippets
+class DateAndSnippet
+  include Comparable
+  attr_reader :date
+  attr_reader :text
 
-#add content from the two arrays to the hash
+  #store date and text attributes
+  def initialize(date, text)
+    @date = Date.parse date
+    @text = text
+  end
+
+  def <=> other
+    self.date <=> other.date
+  end
+end
+
+#array to hold instances of DateAndSnippet
+dates_and_snips_array = []
+
+#add DateAndSnippet instances to array
 count = 0
 while count < dates.length
-  dates_and_snips[dates[count]] = snippets[count]
+  entry = DateAndSnippet.new(dates[count], snippets[count])
+  dates_and_snips_array.push(entry)
   count += 1
 end
 
+#to add to file name
 puts 'Which ballot proposition are you working on? (Type a number.)'
 ballot_prop = gets.chomp
 
-#output hash to JSON
+#output array to CSV
 path = FileUtils.pwd
 FileUtils.mkdir_p(path) unless File.exists?(path)
 new_file = File.new(path + '/Dates_and_Snippets_for_Prop' + ballot_prop.to_s + '.csv', 'w')
 csv_string = CSV.generate do |csv|
-  dates_and_snips.each do |key, value|
-    csv << [key, value]
+  #sort the array by date
+  dates_and_snips_array.sort.each do |entry|
+    csv << [entry.date, entry.text]
   end
 end
 new_file.write(csv_string)
