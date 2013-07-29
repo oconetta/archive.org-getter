@@ -1,6 +1,7 @@
 require 'json'
 require 'fileutils'
 require 'csv'
+load 'date_and_snippet'
 
 #parse data from JSON files and store in array of hashes
 tv_data = JSON.parse(File.read('TVNews_results200.json'))
@@ -40,7 +41,6 @@ titles.each do |inner|
     #put the dates in their own array
     if i == 2
       dates.push(date)
-      puts date
       i = 0
     else
       i += 1
@@ -70,23 +70,6 @@ end
 if dates.length != snippets.length
   #abort, because the rest of the program won't work!
   abort("We don't have the same amount of dates and snippets!")
-end
-
-#class to hold dates and text from snippets
-class DateAndSnippet
-  include Comparable
-  attr_reader :date
-  attr_reader :text
-
-  #store date and text attributes
-  def initialize(date, text)
-    @date = Date.parse date
-    @text = text
-  end
-
-  def <=> other
-    self.date <=> other.date
-  end
 end
 
 #array to hold instances of DateAndSnippet
