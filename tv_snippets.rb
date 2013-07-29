@@ -1,7 +1,7 @@
 require 'json'
 require 'fileutils'
 require 'csv'
-load 'date_and_snippet'
+load 'date_and_snippet.rb'
 
 #parse data from JSON files and store in array of hashes
 tv_data = JSON.parse(File.read('TVNews_results200.json'))
