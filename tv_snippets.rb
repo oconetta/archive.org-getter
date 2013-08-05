@@ -91,7 +91,7 @@ ballot_prop = gets.chomp
 path = FileUtils.pwd
 FileUtils.mkdir_p(path) unless File.exists?(path)
 new_file = File.new(path + '/Dates_and_Snippets_for_Prop' + ballot_prop.to_s + '.csv', 'w')
-csv_string = CSV.generate do |csv|
+csv_string = CSV.generate({:col_sep => ',', :quote_char => '"'}) do |csv|
   #sort the array by date
   dates_and_snips_array.sort.each do |entry|
     csv << [entry.date, entry.text]

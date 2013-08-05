@@ -3,11 +3,95 @@ require 'fileutils'
 require 'pp'
 load 'date_and_snippet.rb'
 
+#DEFINE METHODS
+
+class Hash
+	#method to write results to file
+	def write_to_CSV(prop_num, path)
+		path = FileUtils.pwd
+		FileUtils.mkdir_p(path) unless File.exists?(path)
+		new_file = File.new(path + '/Expanded_URLs_for_Prop_' + prop_num + '.csv', 'w')
+		csv_string = CSV.generate do |csv|
+		  self.each do |key, value|
+		    csv << [key, value]
+		  end
+		end
+		new_file.write(csv_string)
+		new_file.close
+		if File.exists?(path)
+			puts 'CSV export successful!'
+		else
+			puts 'CSV export failed'
+		end
+	end
+end
+
+csv_array = []
+#method to read from multiple CSV files and store in array
+def csv_to_array(folder, array)
+	@array = array
+	@folder = folder
+	files_array = []
+	#get file path
+	@path = FileUtils.pwd + '/' + @folder + '/'
+	files_in_path = Dir.entries(@path)
+	files_in_path.delete_if { |file| !file.include?('csv') }
+	files_in_path.each do |file|
+		text = File.read(@path + file)
+		text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+		text = text.gsub(/\\\"/, "\"\"")
+		CSV.parse(text, {:col_sep => ',', :quote_char => '"'}) do |entry|
+			entry = DateAndSnippet.new(entry[0], entry[1])
+			@array.push(entry)
+		end
+	end
+	@array = @array.flatten
+	return @array
+end
+
+#TODO
+#most frequent words total
+def preprocess(string)
+	string = string.gsub(/\W/, ' ')
+	string = string.downcase
+	return string
+end
+
+def find_frequent_words(date_and_snippet_array)
+	snippet_array = []
+	frequencies = Hash.new(0)
+	date_and_snippet_array.each do |entry|
+		text = entry.text
+		text = preprocess(text)
+		snippet_array.push(text)
+	end
+	snippet_array = snippet_array.flatten
+	text_array = []
+	snippet_array.each do |text|
+		text = text.split(' ')
+		text.each do |word|
+			text_array.push(word)
+			frequencies[word] += 1
+		end
+	end
+	frequencies = frequencies.sort_by { |a, b| b }
+	frequencies = Hash[frequencies.reverse!]
+	return frequencies
+end
+
+#most frequent words as time changes (by week, 12 week)
+#observe how frequency of word we pick changes
+
+#output item to hash IF item is not a stopword
+
+#sort by source
+
+#RUN PROGRAM
 #check for right directory
 puts 'This script will not work unless you are in the folder that contains the folder your CSV files are located in.'
 puts 'Are you in that folder? Answer n if not, any other letter if so.'
 yn = gets.chomp
-yn = yn.downcase!
+yn = yn.downcase
 if yn == 'n' then abort('Add the files to this directory and try again.') end
 
 #pick the correct folder with the CSV data
@@ -15,14 +99,7 @@ puts 'Here are the files in this directory:'
 puts Dir.glob('*')
 puts 'Write the name of the folder you want to work from EXACTLY as it is shown:'
 folder_name = gets.chomp
-#note: path names cannot have spaces
-
-#read CSV files
-path = FileUtils.pwd + '/' + folder_name + '/'
-files_in_path = Dir.entries(path)
-files_in_path.delete_if { |file| !file.include?('csv') }
-files_in_path.each do |file|
-end
+#note: path and file names cannot have spaces
 
 search_terms = []
 
@@ -53,26 +130,17 @@ pp search_terms
 puts 'Would you like to add any more search terms?'
 puts 'Enter n if not; enter any other letter if yes'
 yn_2 = gets.chomp
-yn_2 = yn_2.downcase!
+yn_2 = yn_2.downcase
 if yn_2 != 'n'
 	puts 'Enter your extra search terms. Separate each one by a comma and a space:'
 	new_search_terms = gets.chomp
+	new_search_terms = new_search_terms.downcase
 	new_search_terms = new_search_terms.split(', ')
 	search_terms = search_terms.concat(new_search_terms)
+elsif yn_2 == 'n'
+	nil
 end
 
-pp search_terms
-#ask user for proposition
-#switch statement with number of proposition and that gives you key words to look at
-#user can plug in any word and see how frequency changes over time
-	#have set options for each proposition and option to add any extra words
-
-	#look for n-grams
-
-#most frequent words total
-#most frequent words as time changes (by week, 12 week)
-#observe how frequency of word we pick changes
-
-#output item to hash IF item is not a stopword
-
-#sort by source
+csv_array = csv_to_array(folder_name, csv_array)
+frequent_words = find_frequent_words(csv_array)
+pp frequent_words
