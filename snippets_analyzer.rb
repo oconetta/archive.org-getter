@@ -60,19 +60,23 @@ end
 def find_frequent_words(date_and_snippet_array)
 	snippet_array = []
 	frequencies = Hash.new(0)
+	file = File.read(FileUtils.pwd + '/stopwords.txt')
+	stopwords = file.split(' ')
 	date_and_snippet_array.each do |entry|
 		text = entry.text
-		text = preprocess(text)
+		text = preprocess(text).split(' ')
 		snippet_array.push(text)
 	end
 	snippet_array = snippet_array.flatten
-	text_array = []
-	snippet_array.each do |text|
-		text = text.split(' ')
-		text.each do |word|
-			text_array.push(word)
-			frequencies[word] += 1
+	snippet_array.each do |word|
+		not_found = true
+		stopwords.each do |stopword|
+			if word == stopword
+				snippet_array.delete(word) 
+				not_found = false
+			end	
 		end
+		if not_found then frequencies[word] += 1 end
 	end
 	frequencies = frequencies.sort_by { |a, b| b }
 	frequencies = Hash[frequencies.reverse!]
